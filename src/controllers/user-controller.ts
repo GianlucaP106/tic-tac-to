@@ -1,9 +1,9 @@
 import { User } from "@prisma/client";
 import { prisma } from "../../prisma/prisma";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { Auth } from "@/hooks/useAuth";
 import { redirect } from "next/navigation";
+import { authOptions } from "@/auth/nextauth";
 
 
 export async function getUserByEmail(email: string): Promise<User | null> {
