@@ -1,0 +1,9 @@
+
+Steps to deploy for future:
+- do not export anything else other than GET and POST in route.ts
+- change schema to have correct env variables
+- add env variables to vercel
+- add secret in next auth, needed for production
+- change origins in oauth providers
+- push schema to prod db
+
