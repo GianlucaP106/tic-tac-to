@@ -1,5 +1,6 @@
 import getAuth from "@/controllers/user-controller"
 import { ReactNode } from "react"
+import LoginBtn from "./login-btn"
 
 type Props = {
     children: ReactNode
@@ -10,11 +11,12 @@ export default async function Nav(props: Props) {
 
     return (
         <div>
-            {auth.user &&
-                <div className="w-full bg-neutral-900 flex justify-end items-center px-5">
+            <div className="w-full bg-neutral-900 flex justify-end items-center p-5 gap-5">
+                <LoginBtn />
+                {auth.user &&
                     <p>Logged in as {auth.user.email}</p>
-                </div>
-            }
+                }
+            </div>
             {props.children}
         </div>
     )

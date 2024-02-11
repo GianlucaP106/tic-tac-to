@@ -67,10 +67,18 @@ model Game {
   player1Turn  Boolean
   player1Token GameToken
   gameState    GameToken[]
+  gameStatus   GameStatus
 }
 
 enum GameToken {
   E
   X
   O
+}
+
+enum GameStatus {
+  ongoing
+  tie
+  player1Win
+  player2Win
 }

@@ -8,6 +8,7 @@ import { useState } from "react";
 type Props = {
     game: Game;
     myTurn: boolean
+    turnString: string
     home: boolean
     op: User | null
 }
@@ -32,13 +33,17 @@ export default function TableRowWrapper(props: Props) {
         return <Button onClick={handleCopyClick}>{copied ? "Copied" : "Copy invite link"}</Button>
     }
 
+    const goToGame = () => {
+        window.location.href = `/games/${props.game.id}`
+    }
+
     return (
         <>
             <TableRow key={props.game.id}>
-                <TableCell onClick={() => window.location.href = `/games/${props.game.id}`} className="font-medium cursor-pointer">{props.game.id}</TableCell>
-                <TableCell className="cursor-pointer" >{props.home ? "Home" : "Away"}</TableCell>
-                <TableCell className="cursor-pointer" >{props.op ? (props.op.name || props.op.email) : <Copy />}</TableCell>
-                <TableCell className="text-right cursor-pointer">{props.myTurn ? "Your turn" : "Op turn"}</TableCell>
+                <TableCell onClick={goToGame} className="font-medium cursor-pointer">{props.game.id}</TableCell>
+                <TableCell onClick={goToGame} className="cursor-pointer" >{props.home ? "Home" : "Away"}</TableCell>
+                <TableCell onClick={props.op ? goToGame : undefined} className="cursor-pointer" >{props.op ? (props.op.name || props.op.email) : <Copy />}</TableCell>
+                <TableCell onClick={goToGame} className="text-right cursor-pointer">{props.turnString}</TableCell>
             </TableRow>
         </>
     )

@@ -1,4 +1,4 @@
-import { Game, GameToken, User } from "@prisma/client";
+import { Game, GameStatus, GameToken, User } from "@prisma/client";
 import { prisma } from "../../prisma/prisma";
 import { getPrincipal } from "./user-controller";
 
@@ -27,7 +27,8 @@ export async function createGame(email: string): Promise<Game> {
             player1Id: principal.id,
             player1Token: GameToken.O,
             player1Turn: true,
-            gameState: gameState
+            gameState: gameState,
+            gameStatus: GameStatus.ongoing
         }
     })
 }
@@ -53,8 +54,8 @@ export async function getGamesByPrincipal(): Promise<Game[]> {
 }
 
 
-export function computeTurn(user: User, game: Game) {
-    const home: boolean = user.id === game.player1Id
+export function computeTurn(user: User, game: Game): boolean {
+    const home: boolean = isPlayer1(user, game)
     return (home && game.player1Turn) || (!home && !game.player1Turn)
 }
 
@@ -77,18 +78,29 @@ export async function makeMove(gameId: string, index: number): Promise<Game> {
         throw new Error("Bad move")
     }
 
-    const myToken = game.player1Id === principal.id ? GameToken.O : GameToken.X
+    const myToken = isPlayer1(principal, game) ? GameToken.O : GameToken.X
     const state = [...game.gameState]
 
     if (state[index] !== GameToken.E) {
         throw new Error("Bad move")
     }
 
+    if (game.gameStatus !== GameStatus.ongoing) {
+        throw new Error("Bad move")
+    }
+
     state[index] = myToken
 
-    // check winner
-    const winner = checkWinner(state)
-    // TODO: winner
+
+    const gameStatus: GameStatus = (() => {
+        const winner = checkWinner(state)
+        if (winner) {
+            return winner === game.player1Token ? GameStatus.player1Win : GameStatus.player2Win
+        }
+        const isTie = checkTie(state)
+        if (isTie) return GameStatus.tie
+        return GameStatus.ongoing
+    })()
 
     return prisma.game.update({
         where: {
@@ -96,11 +108,16 @@ export async function makeMove(gameId: string, index: number): Promise<Game> {
         },
         data: {
             gameState: state,
-            player1Turn: !game.player1Turn
+            player1Turn: !game.player1Turn,
+            gameStatus
         }
     })
 }
 
+
+export function isPlayer1(player: User, game: Game): boolean {
+    return player.id === game.player1Id
+}
 
 export async function joinGame(gameId: string): Promise<Game> {
     const principal = await getPrincipal()
@@ -120,6 +137,33 @@ export async function joinGame(gameId: string): Promise<Game> {
 
 }
 
+
+export function getTurnString(principal: User, game: Game) {
+    const player1 = isPlayer1(principal, game)
+    if (game.gameStatus === GameStatus.player1Win) {
+        if (player1) return "You won!"
+        return "You lost"
+    }
+
+    if (game.gameStatus === GameStatus.player2Win) {
+        if (!player1) return "You won!"
+        return "You lost"
+    }
+
+    if (game.gameStatus === GameStatus.tie) {
+        return "Its a tie"
+    }
+
+    const myTurn = computeTurn(principal, game)
+    return myTurn ? "Your Turn" : "Oponent Turn"
+}
+
+function checkTie(board: GameToken[]): boolean {
+    for (let token of board) {
+        if (token === GameToken.E) return false
+    }
+    return true
+}
 
 function checkWinner(board: GameToken[]) {
     const winningCombos = [

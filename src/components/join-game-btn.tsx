@@ -3,6 +3,7 @@
 import { Button } from './ui/button'
 
 type Props = {
+    gameId: string
     join: () => void
 }
 
@@ -11,7 +12,9 @@ export default function JoinGameBtn(props: Props) {
         <div>
             <Button onClick={() => {
                 props.join()
-                window.location.href = "/games"
+                setTimeout(() => {
+                    window.location.href = `/games/${props.gameId}`
+                }, 1000)
             }}>Join game</Button>
         </div>
     )

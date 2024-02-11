@@ -2,6 +2,7 @@ import Board from "@/components/board"
 import JoinGameBtn from "@/components/join-game-btn"
 import { getGameById, joinGame } from "@/controllers/game-controller"
 import { getPrincipal } from "@/controllers/user-controller"
+import { redirect } from "next/navigation"
 
 type Props = {
     params: {
@@ -15,7 +16,7 @@ export default async function page(props: Props) {
     const principal = await getPrincipal()
 
 
-    if (!game) {
+    if (!game || (principal.id !== game.player1Id && game.player2Id && principal.id !== game.player2Id)) {
         return (
             <div>
                 No game found
@@ -32,7 +33,7 @@ export default async function page(props: Props) {
     if (principal.id !== game.player1Id && principal.id !== game.player2Id) {
         return (
             <div className="p-24">
-                <JoinGameBtn join={join} />
+                <JoinGameBtn join={join} gameId={game.id} />
             </div>
         )
     }
