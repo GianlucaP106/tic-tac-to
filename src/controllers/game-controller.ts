@@ -1,6 +1,6 @@
 import { Game, GameStatus, GameToken, User } from "@prisma/client";
 import { prisma } from "../../prisma/prisma";
-import { getPrincipal } from "./user-controller";
+import { getPrincipal, getUserById } from "./user-controller";
 
 
 export async function getGameById(id: string): Promise<Game | null> {
@@ -135,6 +135,12 @@ export async function joinGame(gameId: string): Promise<Game> {
         }
     })
 
+}
+
+
+export async function getOponent(principal: User, game: Game): Promise<User | null> {
+    const home: boolean = isPlayer1(principal, game)
+    return home ? (game.player2Id ? await getUserById(game.player2Id as string) : null) : await getUserById(game.player1Id)
 }
 
 

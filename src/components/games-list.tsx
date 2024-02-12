@@ -1,7 +1,6 @@
-import { computeTurn, getGamesByPrincipal, getTurnString } from "@/controllers/game-controller"
+import { computeTurn, getGamesByPrincipal, getOponent, getTurnString } from "@/controllers/game-controller"
 import { Table, TableBody, TableCaption, TableHead, TableHeader, TableRow } from "./ui/table"
-import { getPrincipal, getUserById } from "@/controllers/user-controller"
-import { User } from "@prisma/client"
+import { getPrincipal } from "@/controllers/user-controller"
 import TableRowWrapper from "./table-row"
 
 type Props = {}
@@ -15,7 +14,7 @@ export default async function GamesList(props: Props) {
         for (let game of games) {
             const home: boolean = principal.id === game.player1Id
             const myTurn = computeTurn(principal, game)
-            const op: User | null = home ? (game.player2Id ? await getUserById(game.player2Id as string) : null) : await getUserById(game.player1Id)
+            const op = await getOponent(principal, game)
             out.push(
                 <TableRowWrapper key={game.id} game={game} op={op} home={home} myTurn={myTurn} turnString={getTurnString(principal, game)} />
             )

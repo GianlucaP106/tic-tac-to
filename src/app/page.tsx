@@ -7,8 +7,8 @@ export default async function Home() {
     const auth = await getAuth()
     return (
         <main className="flex flex-col items-center justify-between p-24">
-            <div className="flex flex-col gap-3">
-                <h2>Welcome to Tic Tac To</h2>
+            <div className="flex flex-col items-center gap-3">
+                <h2 className="text-4xl font-semibold mb-10">Welcome to Tic Tac To</h2>
                 {auth.loggedIn &&
                     <div className="flex gap-4">
                         <Link href={"/games/new"}>

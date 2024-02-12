@@ -22,7 +22,7 @@ export default async function page(props: Props) {
         <div className="flex flex-col justify-center items-center p-24">
             <div>
                 <form action={create}>
-                    <Button type="submit" variant={"outline"} className="text-black">Create new game</Button>
+                    <Button type="submit" variant={"outline"} className="text-black">Create a new game</Button>
                 </form>
             </div>
         </div>
